@@ -83,7 +83,11 @@ def generate_test_script():
             },
             headers={"Content-Type": "application/json"}
         )
-        return res.text, res.status_code
+
+        res_json = res.json()
+        content_list = res_json.get('content', [])
+
+        return "\n".join(content_list), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
