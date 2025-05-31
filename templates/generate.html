@@ -1,161 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Test Scenario Preview</title>
-  <style>
-    body { font-family: Arial; margin: 40px auto; max-width: 900px; text-align: center; }
+    <meta charset="UTF-8">
+    <title>Test Scenario Preview</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px auto;
+            max-width: 900px;
+            text-align: center;
+        }
 
-    .carousel-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+        .carousel-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-    .image-preview-container {
-      display: flex;
-      flex-wrap: nowrap;
-      overflow: hidden;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      flex-grow: 1;
-      min-height: 150px;
-    }
+        .image-preview-container {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-grow: 1;
+            min-height: 150px;
+        }
 
-    .preview-img {
-      width: 140px;
-      height: 140px;
-      object-fit: cover;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 1px solid #ccc;
-    }
+        .preview-img {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+        }
 
-    .arrow-btn {
-      font-size: 24px;
-      padding: 6px 12px;
-      cursor: pointer;
-      border: none;
-      background: #3b82f6;
-      color: white;
-      border-radius: 6px;
-      font-weight: bold;
-      height: 40px;
-    }
+        .arrow-btn {
+            font-size: 24px;
+            padding: 6px 12px;
+            cursor: pointer;
+            border: none;
+            background: #3b82f6;
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            height: 40px;
+        }
 
-    .arrow-btn.hidden {
-      display: none;
-    }
+        .arrow-btn.hidden {
+            display: none;
+        }
 
-    .zoom-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
+        .zoom-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
 
-    .zoom-overlay img {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 6px;
-      box-shadow: 0 0 20px #fff;
-    }
+        .zoom-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 6px;
+            box-shadow: 0 0 20px #fff;
+        }
 
-    .zoom-close {
-      position: fixed;
-      top: 20px;
-      right: 30px;
-      color: white;
-      font-size: 30px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 1001;
-    }
+        .zoom-close {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
 
-    .textarea-container {
-      text-align: left;
-      margin: 20px auto;
-      max-width: 700px;
-    }
+        .textarea-container {
+            text-align: left;
+            margin: 20px auto;
+            max-width: 700px;
+        }
 
-    textarea {
-      width: 100%;
-      min-height: 100px;
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      resize: vertical;
-    }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
 
-    .label-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
 
-    #charCount {
-      font-weight: normal;
-      font-size: 13px;
-      color: #666;
-    }
+        #charCount {
+            font-weight: normal;
+            font-size: 13px;
+            color: #666;
+        }
 
-    #generate-api-btn {
-      margin: 20px auto;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #6366f1;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  </style>
+        #generate-api-btn {
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  <h2>Test Scenario – Preview ảnh</h2>
+<h2>Test Scenario – Preview ảnh</h2>
 
-  <div class="carousel-wrapper">
+<div class="carousel-wrapper">
     <button id="leftBtn" class="arrow-btn" onclick="slideLeft()">&lt;</button>
     <div class="image-preview-container" id="previewContainer"></div>
     <button id="rightBtn" class="arrow-btn" onclick="slideRight()">&gt;</button>
-  </div>
+</div>
 
-  <!-- TEXT AREA: FEATURE DESCRIPTION -->
-  <div class="textarea-container">
+<!-- TEXT AREA: FEATURE DESCRIPTION -->
+<div class="textarea-container">
     <div class="label-row">
-      <label for="featureDesc">Feature Description</label>
-      <span id="charCount">250 characters remaining</span>
+        <label for="featureDesc">Feature Description</label>
+        <span id="charCount">250 characters remaining</span>
     </div>
     <textarea id="featureDesc" maxlength="250" oninput="updateCharCount()"></textarea>
-  </div>
+</div>
 
-  <!-- GENERATE BUTTON -->
-  <div style="text-align: center;">
+<!-- GENERATE BUTTON -->
+<div style="text-align: center;">
     <button id="generate-api-btn" onclick="callGenerateAPI()">Generate</button>
-  </div>
+</div>
 
-  <!-- TEXT AREA: TEST SCRIPT -->
-  <div class="textarea-container">
+<!-- TEXT AREA: TEST SCRIPT -->
+<div class="textarea-container">
     <label for="testScript">Test Script</label>
     <textarea id="testScript" readonly></textarea>
-  </div>
+</div>
 
-  <!-- ZOOM MODAL -->
-  <div class="zoom-overlay" id="zoomOverlay" onclick="hideZoom()">
+<!-- ZOOM MODAL -->
+<div class="zoom-overlay" id="zoomOverlay" onclick="hideZoom()">
     <span class="zoom-close" onclick="hideZoom()">×</span>
     <img id="zoomImage" src="">
-  </div>
+</div>
 
-  <script>
+<script>
     const allUrls = {{ urls | tojson }};
     const previewContainer = document.getElementById('previewContainer');
     const leftBtn = document.getElementById('leftBtn');
@@ -163,89 +170,86 @@
     let currentIndex = 0;
 
     function renderPreviews() {
-      previewContainer.innerHTML = '';
-      const visible = allUrls.slice(currentIndex, currentIndex + 5);
-      visible.forEach(url => {
-        const img = document.createElement('img');
-        img.src = url;
-        img.className = 'preview-img';
-        img.onclick = () => showZoom(url);
-        previewContainer.appendChild(img);
-      });
+        previewContainer.innerHTML = '';
+        const visible = allUrls.slice(currentIndex, currentIndex + 5);
+        visible.forEach(url => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = 'preview-img';
+            img.onclick = () => showZoom(url);
+            previewContainer.appendChild(img);
+        });
 
-      leftBtn.classList.toggle('hidden', currentIndex === 0);
-      rightBtn.classList.toggle('hidden', currentIndex + 5 >= allUrls.length);
-      if (allUrls.length <= 5) {
-        leftBtn.classList.add('hidden');
-        rightBtn.classList.add('hidden');
-      }
+        leftBtn.classList.toggle('hidden', currentIndex === 0);
+        rightBtn.classList.toggle('hidden', currentIndex + 5 >= allUrls.length);
+        if (allUrls.length <= 5) {
+            leftBtn.classList.add('hidden');
+            rightBtn.classList.add('hidden');
+        }
     }
 
     function slideLeft() {
-      if (currentIndex > 0) {
-        currentIndex -= 1;
-        renderPreviews();
-      }
+        if (currentIndex > 0) {
+            currentIndex -= 1;
+            renderPreviews();
+        }
     }
 
     function slideRight() {
-      if (currentIndex + 5 < allUrls.length) {
-        currentIndex += 1;
-        renderPreviews();
-      }
+        if (currentIndex + 5 < allUrls.length) {
+            currentIndex += 1;
+            renderPreviews();
+        }
     }
 
     function showZoom(src) {
-      const overlay = document.getElementById('zoomOverlay');
-      const zoomImg = document.getElementById('zoomImage');
-      zoomImg.src = src;
-      overlay.style.display = 'flex';
+        const overlay = document.getElementById('zoomOverlay');
+        const zoomImg = document.getElementById('zoomImage');
+        zoomImg.src = src;
+        overlay.style.display = 'flex';
     }
 
     function hideZoom() {
-      const overlay = document.getElementById('zoomOverlay');
-      overlay.style.display = 'none';
-      document.getElementById('zoomImage').src = '';
+        const overlay = document.getElementById('zoomOverlay');
+        overlay.style.display = 'none';
+        document.getElementById('zoomImage').src = '';
     }
 
     function updateCharCount() {
-      const textarea = document.getElementById('featureDesc');
-      const countDisplay = document.getElementById('charCount');
-      const remaining = 250 - textarea.value.length;
-      countDisplay.textContent = `${remaining} characters remaining`;
+        const textarea = document.getElementById('featureDesc');
+        const countDisplay = document.getElementById('charCount');
+        const remaining = 250 - textarea.value.length;
+        countDisplay.textContent = `${remaining} characters remaining`;
     }
 
-    async function callGenerateAPI() {
-      const featureDesc = document.getElementById('featureDesc').value.trim();
-      const visibleImages = allUrls.slice(currentIndex, currentIndex + 5);
+    function callGenerateAPI() {
+        const featureDesc = document.getElementById('featureDesc').value.trim();
+        const visibleImages = Array.from(document.querySelectorAll('.preview-img')).map(img => img.src);
 
-      if (!featureDesc) {
-        alert("Vui lòng nhập Feature Description.");
-        return;
-      }
+        if (!featureDesc) {
+            alert("Vui lòng nhập Feature Description.");
+            return;
+        }
 
-      const payload = {
-        images: visibleImages,
-        action: featureDesc
-      };
-
-      try {
-        const res = await fetch('http://14.225.36.82:5000/get-test-scenario', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await res.text(); // có thể là text hoặc json
-
-        document.getElementById('testScript').value = result;
-      } catch (err) {
-        alert("Lỗi khi gọi API.");
-        console.error(err);
-      }
+        fetch("/generate-test-script", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                images: visibleImages,
+                action: featureDesc
+            })
+        })
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('testScript').value = data;
+            })
+            .catch(err => {
+                alert("Lỗi khi gọi API nội bộ.");
+                console.error(err);
+            });
     }
 
     renderPreviews();
-  </script>
+</script>
 </body>
 </html>

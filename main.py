@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request, url_for, jsonify
 import os
-from werkzeug.utils import secure_filename
 from datetime import datetime
 import json
+import requests
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 @app.route('/generate', methods=['POST'])
 def generate():
@@ -19,12 +20,14 @@ def generate():
 
     return render_template('generate.html', urls=urls)
 
+
 def generate_filename(ext):
     now = datetime.now()
     date_part = now.strftime('%d%m%Y')
     midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
     delta_ms = int((now - midnight).total_seconds() * 1000)
     return f"{date_part}_{delta_ms}.{ext}"
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -52,6 +55,7 @@ def index():
 
     return render_template('index.html', image_urls=image_urls)
 
+
 @app.route('/delete', methods=['DELETE'])
 def delete_image():
     filename = request.args.get('filename')
@@ -64,6 +68,26 @@ def delete_image():
         return jsonify({"status": "success"})
     else:
         return jsonify({"error": "File not found"}), 404
+
+
+@app.route("/generate-test-script", methods=["POST"])
+def generate_test_script():
+    data = request.get_json()
+
+    try:
+        res = requests.post(
+            "http://14.225.36.82:5000/get-test-scenario",
+            json={
+                "images": data.get("images", []),
+                "action": data.get("action", "")
+            },
+            headers={"Content-Type": "application/json"}
+        )
+        return res.text, res.status_code
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
