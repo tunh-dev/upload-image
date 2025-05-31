@@ -2,11 +2,22 @@ from flask import Flask, render_template, request, url_for, jsonify
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import json
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    urls_json = request.form.get('urls')
+    try:
+        urls = json.loads(urls_json)
+    except:
+        urls = []
+
+    return render_template('generate.html', urls=urls)
 
 def generate_filename(ext):
     now = datetime.now()
@@ -54,5 +65,5 @@ def delete_image():
     else:
         return jsonify({"error": "File not found"}), 404
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

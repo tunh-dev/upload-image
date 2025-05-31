@@ -1,21 +1,30 @@
 # Base image
 FROM python:3.10
 
-# Set working directory
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Set workdir
 WORKDIR /app
 
-# Copy code
-COPY . /app
+# Install system dependencies (nếu cần)
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+# Install Python dependencies
+COPY requirements.txt /app/
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Create uploads folder if not exists
+# Copy entire project
+COPY . /app/
+
+# Ensure uploads folder exists
 RUN mkdir -p /app/static/uploads
 
 # Expose port
 EXPOSE 5000
 
-# Run app using Gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+# Start the app with Python (Flask built-in server)
+CMD ["python", "main.py"]
