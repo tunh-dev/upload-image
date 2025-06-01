@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, jsonify
+from flask import Flask, render_template, request, url_for, jsonify, redirect
 import os
 from datetime import datetime
 import json
@@ -91,6 +91,11 @@ def generate_test_script():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/back', methods=['GET'])
+def go_back():
+    return redirect('/')
 
 
 if __name__ == '__main__':

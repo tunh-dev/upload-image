@@ -1,273 +1,238 @@
+<!-- full index.html updated with label-wrapped .image-item -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Upload hoặc Paste Nhiều Ảnh</title>
-  <style>
-    body { font-family: Arial; margin: 40px auto; max-width: 1000px; }
+    <meta charset="UTF-8">
+    <title>Upload hoặc Paste Nhiều Ảnh</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px auto;
+            max-width: 1000px;
+        }
 
-    form { text-align: center; margin-bottom: 30px; }
+        form {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-    .top-bar {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+        .top-bar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    #generate-btn {
-      padding: 10px 16px;
-      font-size: 16px;
-      background: #10b981;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+        #upload-btn {
+            padding: 10px 16px;
+            font-size: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-    }
+        #generate-btn {
+            padding: 10px 16px;
+            font-size: 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
 
-    .image-item {
-      display: flex;
-      align-items: center;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 10px;
-      background: #fafafa;
-    }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
 
-    .thumbnail {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-right: 15px;
-      cursor: pointer;
-    }
+        .image-item {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            background: #fafafa;
+            cursor: pointer;
+        }
 
-    .url-block {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
+        .thumbnail {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 15px;
+        }
 
-    .url-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
+        .url-block {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .url-text {
-      flex: 1;
-      padding: 6px 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 14px;
-    }
+        .url-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
 
-    .copy-btn, .delete-btn {
-      padding: 6px 10px;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
+        .url-text {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
 
-    .copy-btn { background: #3b82f6; }
-    .delete-btn { background: red; }
+        .copy-btn, .delete-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-    .zoom-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
+        .copy-btn {
+            background: #3b82f6;
+        }
 
-    .zoom-overlay img {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 6px;
-      box-shadow: 0 0 20px #fff;
-    }
+        .delete-btn {
+            background: red;
+        }
 
-    .zoom-close {
-      position: fixed;
-      top: 20px;
-      right: 30px;
-      color: white;
-      font-size: 30px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 1001;
-    }
+        .zoom-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
 
-    .checkbox {
-      margin-right: 10px;
-      transform: scale(1.2);
-    }
-  </style>
+        .zoom-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 6px;
+            box-shadow: 0 0 20px #fff;
+        }
+
+        .zoom-close {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .checkbox {
+            margin-right: 10px;
+            transform: scale(1.2);
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="top-bar">
-    <button id="generate-btn" onclick="generateTestScenario()">Generate TestScenario</button>
-  </div>
+<h2 style="text-align:center">Upload một hoặc nhiều ảnh</h2>
 
-  <h2 style="text-align:center">Upload hoặc Paste Nhiều Ảnh</h2>
-
-  <form id="upload-form" method="POST" enctype="multipart/form-data">
+<form id="upload-form" method="POST" enctype="multipart/form-data">
     <input type="file" id="file-input" name="images" multiple accept="image/*">
     <br><br>
-    <button type="submit">Tải ảnh lên</button>
-    <p>Hoặc nhấn Ctrl + V để paste ảnh từ clipboard</p>
-  </form>
-
-  <div class="preview-container" id="preview-container" style="text-align: center;"></div>
-
-  {% if image_urls %}
-    <h3>Danh sách ảnh đã lưu:</h3>
-    <div class="grid" id="imageGrid">
-      {% for img in image_urls %}
-        <div class="image-item">
-          <input type="checkbox" class="checkbox" value="{{ request.url_root }}{{ img[1:] }}">
-          <img class="thumbnail" src="{{ img }}" onclick="showZoom('{{ img }}')">
-          <div class="url-block">
-            <div class="url-row">
-              <input type="text" class="url-text" value="{{ request.url_root }}{{ img[1:] }}" readonly>
-              <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
-              <button class="delete-btn" onclick="deleteImage('{{ img }}')">X</button>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
+    <h2>Hoặc nhấn Ctrl + V để paste một hoặc nhiều ảnh</h2>
+    <div class="top-bar">
+        <button id="upload-btn" type="submit">Tải ảnh lên</button>
     </div>
-  {% endif %}
+</form>
 
-  <!-- ZOOM MODAL -->
-  <div class="zoom-overlay" id="zoomOverlay" onclick="hideZoom()">
+<div class="preview-container" id="preview-container" style="text-align: center;"></div>
+
+{% if image_urls %}
+    <h3>Danh sách ảnh đã lưu:</h3>
+    <div class="top-bar">
+        <button id="generate-btn" onclick="generateTestScenario()">Generate TestScenario</button>
+    </div>
+    <div class="grid" id="imageGrid">
+        {% for img in image_urls %}
+            <label class="image-item">
+                <input type="checkbox" class="checkbox" value="{{ request.url_root }}{{ img[1:] }}">
+                <img class="thumbnail" src="{{ img }}" onclick="showZoom('{{ img }}'); event.stopPropagation();">
+                <div class="url-block">
+                    <div class="url-row">
+                        <input type="text" class="url-text" value="{{ request.url_root }}{{ img[1:] }}" readonly>
+                        <button class="copy-btn" onclick="copyToClipboard(this); event.stopPropagation();">Copy</button>
+                        <button class="delete-btn" onclick="deleteImage('{{ img }}'); event.stopPropagation();">X</button>
+                    </div>
+                </div>
+            </label>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="zoom-overlay" id="zoomOverlay" onclick="hideZoom()">
     <span class="zoom-close" onclick="hideZoom()">×</span>
     <img id="zoomImage" src="">
-  </div>
+</div>
 
-  <form id="scenario-form" method="POST" action="/generate" target="_blank" style="display: none;">
+<form id="scenario-form" method="POST" action="/generate" target="_self" style="display: none;">
     <input type="hidden" name="urls" id="scenario-urls">
-  </form>
+</form>
 
-  <script>
-    const fileInput = document.getElementById('file-input');
-    const form = document.getElementById('upload-form');
-    const previewContainer = document.getElementById('preview-container');
-    const scenarioForm = document.getElementById('scenario-form');
-    const scenarioUrlsInput = document.getElementById('scenario-urls');
-    let filesToUpload = [];
-
-    function addPreviewImage(file) {
-      if (!file.type.startsWith('image/')) return;
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.style.width = '100px';
-        img.style.height = '100px';
-        img.style.objectFit = 'cover';
-        img.style.margin = '5px';
-        previewContainer.appendChild(img);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    fileInput.addEventListener('change', (e) => {
-      const selected = [...e.target.files];
-      filesToUpload.push(...selected);
-      selected.forEach(file => addPreviewImage(file));
-    });
-
-    document.addEventListener('paste', function (event) {
-      const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-      for (let item of items) {
-        if (item.type.startsWith("image")) {
-          const blob = item.getAsFile();
-          if (blob) {
-            const file = new File([blob], `clipboard_${Date.now()}.png`, { type: blob.type });
-            filesToUpload.push(file);
-            addPreviewImage(file);
-          }
-        }
-      }
-    });
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (filesToUpload.length === 0) {
-        alert("Vui lòng chọn hoặc paste ảnh trước khi upload.");
-        return;
-      }
-
-      const formData = new FormData();
-      filesToUpload.forEach((file, index) => {
-        formData.append("images", file, file.name || `blob_${index}.png`);
-      });
-
-      fetch("/", {
-        method: "POST",
-        body: formData
-      }).then(() => {
-        location.reload();
-      });
-    });
-
-    function deleteImage(imageUrl) {
-      const filename = imageUrl.split('/').pop();
-      fetch(`/delete?filename=${filename}`, {
-        method: 'DELETE'
-      }).then(res => res.json()).then(data => {
-        if (data.status === 'success') {
-          location.reload();
-        } else {
-          alert("Lỗi khi xóa ảnh: " + data.error);
-        }
-      });
-    }
-
+<script>
     function showZoom(src) {
-      const overlay = document.getElementById('zoomOverlay');
-      const zoomImg = document.getElementById('zoomImage');
-      zoomImg.src = src;
-      overlay.style.display = 'flex';
+        const overlay = document.getElementById('zoomOverlay');
+        const zoomImg = document.getElementById('zoomImage');
+        zoomImg.src = src;
+        overlay.style.display = 'flex';
     }
 
     function hideZoom() {
-      const overlay = document.getElementById('zoomOverlay');
-      overlay.style.display = 'none';
-      document.getElementById('zoomImage').src = '';
+        const overlay = document.getElementById('zoomOverlay');
+        overlay.style.display = 'none';
+        document.getElementById('zoomImage').src = '';
     }
 
     function copyToClipboard(button) {
-      const input = button.parentElement.querySelector('.url-text');
-      input.select();
-      input.setSelectionRange(0, 99999);
-      document.execCommand('copy');
-      button.innerText = 'Copied!';
-      setTimeout(() => { button.innerText = 'Copy'; }, 1500);
+        const input = button.parentElement.querySelector('.url-text');
+        input.select();
+        input.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+        button.innerText = 'Copied!';
+        setTimeout(() => {
+            button.innerText = 'Copy';
+        }, 1500);
+    }
+
+    function deleteImage(imageUrl) {
+        const filename = imageUrl.split('/').pop();
+        fetch(`/delete?filename=${filename}`, {
+            method: 'DELETE'
+        }).then(res => res.json()).then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                alert("Lỗi khi xóa ảnh: " + data.error);
+            }
+        });
     }
 
     function generateTestScenario() {
-      const checked = document.querySelectorAll('.checkbox:checked');
-      const urls = Array.from(checked).map(cb => cb.value);
-      if (urls.length === 0) {
-        alert("Bạn cần chọn ít nhất một ảnh.");
-        return;
-      }
-
-      scenarioUrlsInput.value = JSON.stringify(urls);
-      scenarioForm.submit();
+        const checked = document.querySelectorAll('.checkbox:checked');
+        const urls = Array.from(checked).map(cb => cb.value);
+        if (urls.length === 0) {
+            alert("Bạn cần chọn ít nhất một ảnh.");
+            return;
+        }
+        document.getElementById('scenario-urls').value = JSON.stringify(urls);
+        document.getElementById('scenario-form').submit();
     }
-  </script>
+</script>
 </body>
 </html>

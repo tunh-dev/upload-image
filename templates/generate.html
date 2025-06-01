@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test Scenario Preview</title>
+    <title>Preview</title>
     <style>
         body {
             font-family: Arial;
             margin: 40px auto;
             max-width: 900px;
             text-align: center;
+            position: relative;
         }
 
         .carousel-wrapper {
@@ -125,10 +126,53 @@
             border-radius: 6px;
             cursor: pointer;
         }
+
+        #back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #eee;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* Loading Overlay */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            border: 6px solid #ccc;
+            border-top: 6px solid #6366f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
-<h2>Test Scenario – Preview ảnh</h2>
+<h2>Preview ảnh</h2>
+
+<a id="back-btn" href="/back">← Back</a>
 
 <div class="carousel-wrapper">
     <button id="leftBtn" class="arrow-btn" onclick="slideLeft()">&lt;</button>
@@ -152,14 +196,19 @@
 
 <!-- TEXT AREA: TEST SCRIPT -->
 <div class="textarea-container">
-    <label for="testScript">Test Script</label>
-    <textarea id="testScript" readonly></textarea>
+    <label for="testScript" style="font-weight: bold">Test Script</label>
+    <textarea id="testScript" readonly oninput="autoResize(this)"></textarea>
 </div>
 
 <!-- ZOOM MODAL -->
 <div class="zoom-overlay" id="zoomOverlay" onclick="hideZoom()">
     <span class="zoom-close" onclick="hideZoom()">×</span>
     <img id="zoomImage" src="">
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay">
+    <div class="spinner"></div>
 </div>
 
 <script>
@@ -222,14 +271,23 @@
         countDisplay.textContent = `${remaining} characters remaining`;
     }
 
+    function autoResize(textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+    }
+
     function callGenerateAPI() {
         const featureDesc = document.getElementById('featureDesc').value.trim();
         const visibleImages = Array.from(document.querySelectorAll('.preview-img')).map(img => img.src);
+        const resultArea = document.getElementById('testScript');
 
         if (!featureDesc) {
             alert("Vui lòng nhập Feature Description.");
             return;
         }
+
+        // Show loading
+        document.getElementById('loadingOverlay').style.display = 'flex';
 
         fetch("/generate-test-script", {
             method: "POST",
@@ -241,11 +299,14 @@
         })
             .then(res => res.text())
             .then(data => {
-                document.getElementById('testScript').value = data;
+                resultArea.value = data;
+                autoResize(resultArea);
+                document.getElementById('loadingOverlay').style.display = 'none';
             })
             .catch(err => {
                 alert("Lỗi khi gọi API LLMs.");
                 console.error(err);
+                document.getElementById('loadingOverlay').style.display = 'none';
             });
     }
 
