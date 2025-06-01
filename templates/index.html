@@ -132,14 +132,35 @@
             z-index: 1001;
         }
 
-        .checkbox {
-            transform: scale(1.2);
-            margin-left: 12px;
+        .selected {
+            border: 2px solid #3b82f6;
+            background-color: #e0f0ff;
         }
 
         .selected {
             border: 2px solid #3b82f6;
             background-color: #e0f0ff;
+        }
+
+        .checkbox {
+            appearance: none;
+            width: 26px;
+            height: 26px;
+            border: 2px solid #888;
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+            background: white;
+            cursor: pointer;
+        }
+
+        .checkbox:checked::after {
+            content: '\2714';
+            position: absolute;
+            top: -2px;
+            left: 5px;
+            font-size: 18px;
+            color: #10b981;
         }
     </style>
 </head>
@@ -164,20 +185,23 @@
     </div>
     <div class="grid" id="imageGrid">
         {% for img in image_urls %}
-            <label class="image-item">
-                <div style="display: flex; flex-grow: 1; align-items: center;">
-                    <img class="thumbnail" src="{{ img }}" onclick="showZoom('{{ img }}'); event.stopPropagation();">
-                    <div class="url-block">
+            <label class="image-item" style="justify-content: space-between;">
+                <div style="display: flex; align-items: center; cursor: pointer;"
+                     onclick="showZoom('{{ img }}'); event.stopPropagation();">
+                    <img class="thumbnail" src="{{ img }}">
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-grow: 1;">
+                    <div class="url-block" style="flex-grow: 1;">
                         <div class="url-row">
                             <input type="text" class="url-text" value="{{ request.url_root }}{{ img[1:] }}" readonly>
-                            <button class="copy-btn" onclick="copyToClipboard(this); event.stopPropagation();">Copy</button>
-                            <button class="delete-btn" onclick="deleteImage('{{ img }}'); event.stopPropagation();">X</button>
+                            <button class="copy-btn" onclick="copyToClipboard(this); event.stopPropagation();">Copy
+                            </button>
+                            <button class="delete-btn" onclick="deleteImage('{{ img }}'); event.stopPropagation();">X
+                            </button>
                         </div>
                     </div>
-                </div>
-                <div onclick="this.parentElement.querySelector('input[type=checkbox]').click(); event.stopPropagation();">
                     <input type="checkbox" class="checkbox" value="{{ request.url_root }}{{ img[1:] }}"
-                        onchange="this.closest('label').classList.toggle('selected', this.checked)">
+                           onchange="this.closest('label').classList.toggle('selected', this.checked)">
                 </div>
             </label>
         {% endfor %}
@@ -226,7 +250,7 @@
         for (let item of items) {
             if (item.type.startsWith("image")) {
                 const blob = item.getAsFile();
-                const file = new File([blob], `clipboard_${Date.now()}.png`, { type: blob.type });
+                const file = new File([blob], `clipboard_${Date.now()}.png`, {type: blob.type});
                 filesToUpload.push(file);
                 addPreviewImage(file);
             }
