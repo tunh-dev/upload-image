@@ -8,7 +8,8 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # Cho phép override bằng biến môi trường
-UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', '/var/www/uploads')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
