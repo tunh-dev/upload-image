@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta charset="UTF-8">
     <title>Upload hoặc Paste Nhiều Ảnh</title>
     <style>
@@ -93,6 +94,10 @@
             font-weight: bold;
         }
 
+        button i {
+            font-size: 14px;
+        }
+
         .copy-btn {
             background: #3b82f6;
         }
@@ -162,6 +167,16 @@
             font-size: 18px;
             color: #10b981;
         }
+
+        button i {
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .desc-edit-input {
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -185,25 +200,57 @@
     </div>
     <div class="grid" id="imageGrid">
         {% for img in image_urls %}
-            <label class="image-item" style="justify-content: space-between;">
-                <div style="display: flex; align-items: center; cursor: pointer;"
-                     onclick="showZoom('{{ img }}'); event.stopPropagation();">
-                    <img class="thumbnail" src="{{ img }}">
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px; flex-grow: 1;">
+            <label class="image-item" style="flex-direction: column; align-items: flex-start;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img class="thumbnail" src="{{ img.url }}"
+                         onclick="showZoom('{{ img.url }}'); event.stopPropagation();">
                     <div class="url-block" style="flex-grow: 1;">
-                        <div class="url-row">
-                            <input type="text" class="url-text" value="{{ request.url_root }}{{ img[1:] }}" readonly>
+                        <div class="url-row" style="margin-bottom: 6px;">
+                            <input type="text" class="url-text" value="{{ request.url_root }}{{ img.url[1:] }}"
+                                   readonly>
                             <button class="copy-btn" onclick="copyToClipboard(this); event.stopPropagation();">Copy
                             </button>
-                            <button class="delete-btn" onclick="deleteImage('{{ img }}'); event.stopPropagation();">X
+                            <button class="delete-btn" onclick="deleteImage('{{ img.url }}'); event.stopPropagation();">
+                                X
+                            </button>
+                        </div>
+
+                        <!-- Phần mô tả nằm dưới URL, cùng hàng -->
+                        <div class="url-row" style="align-items: center; gap: 8px;">
+                            <span class="desc-text" style="font-size: 14px; color: #333;">{{ img.description }}</span>
+                            <input type="text" class="desc-edit-input" value="{{ img.description }}"
+                                   style="display:none; flex: 1; padding: 4px;">
+                            <button class="copy-btn" onclick="toggleEdit(this)" title="Sửa mô tả">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="delete-btn" style="background: #10b981;"
+                                    onclick="saveDescription(this, '{{ img.url.split('/')[-1] }}')" title="Lưu mô tả">
+                                <i class="fa-solid fa-floppy-disk"></i>
                             </button>
                         </div>
                     </div>
-                    <input type="checkbox" class="checkbox" value="{{ request.url_root }}{{ img[1:] }}"
+
+                    <input type="checkbox" class="checkbox" value="{{ request.url_root }}{{ img.url[1:] }}"
                            onchange="this.closest('label').classList.toggle('selected', this.checked)">
                 </div>
+
+                {#                <!-- Hiển thị mô tả -->#}
+                {#                <div style="margin-top: 8px; width: 100%;">#}
+                {#                    <span class="desc-text" style="font-size: 14px; color: #333;">{{ img.description }}</span>#}
+                {#                    <input type="text" class="desc-edit-input" value="{{ img.description }}"#}
+                {#                           style="display:none; width: 80%; padding: 4px; margin-top: 5px;">#}
+                {#                    <div style="margin-top: 4px;">#}
+                {#                        <button class="copy-btn" onclick="toggleEdit(this)" title="Sửa mô tả">#}
+                {#                            <i class="fa-solid fa-pen"></i>#}
+                {#                        </button>#}
+                {#                        <button class="delete-btn" style="background: #10b981;"#}
+                {#                                onclick="saveDescription(this, '{{ img.url.split('/')[-1] }}')" title="Lưu mô tả">#}
+                {#                            <i class="fa-solid fa-floppy-disk"></i>#}
+                {#                        </button>#}
+                {#                    </div>#}
+                {#                </div>#}
             </label>
+
         {% endfor %}
     </div>
 {% endif %}
@@ -228,13 +275,28 @@
     function addPreviewImage(file) {
         const reader = new FileReader();
         reader.onload = function (e) {
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'inline-block';
+            wrapper.style.margin = '5px';
+            wrapper.style.textAlign = 'center';
+
             const img = document.createElement('img');
             img.src = e.target.result;
             img.style.width = '100px';
             img.style.height = '100px';
             img.style.objectFit = 'cover';
-            img.style.margin = '5px';
-            previewContainer.appendChild(img);
+            img.style.borderRadius = '4px';
+            wrapper.appendChild(img);
+
+            const inputDesc = document.createElement('input');
+            inputDesc.type = 'text';
+            inputDesc.placeholder = 'Mô tả ảnh';
+            inputDesc.className = 'image-desc-input';
+            inputDesc.style.marginTop = '5px';
+            inputDesc.style.width = '100px';
+            wrapper.appendChild(inputDesc);
+
+            previewContainer.appendChild(wrapper);
         };
         reader.readAsDataURL(file);
     }
@@ -265,8 +327,11 @@
         }
 
         const formData = new FormData();
+        const descInputs = document.querySelectorAll('.image-desc-input');
+
         filesToUpload.forEach((file, index) => {
             formData.append("images", file, file.name || `blob_${index}.png`);
+            formData.append("descriptions", descInputs[index]?.value || "");
         });
 
         fetch("/", {
@@ -332,6 +397,47 @@
             window.history.replaceState(null, null, window.location.href);
         }
     });
+
+    function toggleEdit(button) {
+        const label = button.closest('label');
+        const span = label.querySelector('.desc-text');
+        const input = label.querySelector('.desc-edit-input');
+
+        const isEditing = input.style.display === 'inline-block';
+        if (isEditing) {
+            input.style.display = 'none';
+            span.style.display = 'inline';
+        } else {
+            input.style.display = 'inline-block';
+            span.style.display = 'none';
+            input.focus();
+        }
+    }
+
+    function saveDescription(button, filename) {
+        const label = button.closest('label');
+        const input = label.querySelector('.desc-edit-input');
+        const span = label.querySelector('.desc-text');
+
+        const newDesc = input.value;
+
+        fetch('/update-description', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({filename, description: newDesc})
+        }).then(res => res.json()).then(data => {
+            if (data.status === 'success') {
+                span.innerText = newDesc;
+                input.style.display = 'none';
+                span.style.display = 'inline';
+            } else {
+                alert("Không thể lưu mô tả: " + data.error);
+            }
+        });
+    }
+
 </script>
 </body>
 </html>

@@ -35,10 +35,13 @@ def index():
 
     if request.method == 'POST':
         files = request.files.getlist('images')
-        for file in files:
+        descriptions = request.form.getlist('descriptions')
+        for i, file in enumerate(files):
             if file.filename != '':
                 ext = file.filename.split('.')[-1].lower()
                 filename = generate_filename(ext)
+                description = descriptions[i] if i < len(descriptions) else ""
+                save_metadata(filename, description)
 
                 # Đảm bảo không trùng tên
                 while os.path.exists(os.path.join(UPLOAD_FOLDER, filename)):
@@ -46,12 +49,20 @@ def index():
 
                 save_path = os.path.join(UPLOAD_FOLDER, filename)
                 file.save(save_path)
-                image_urls.append(url_for('static', filename=f'uploads/{filename}'))
+                metadata = load_metadata()
+                image_urls.append({
+                    'url': url_for('static', filename=f'uploads/{file}'),
+                    'description': metadata.get(file, '')
+                })
 
     # Load ảnh đã lưu
     for file in sorted(os.listdir(UPLOAD_FOLDER), reverse=True):
         if file.lower().endswith(('png', 'jpg', 'jpeg', 'gif', 'bmp')):
-            image_urls.append(url_for('static', filename=f'uploads/{file}'))
+            metadata = load_metadata()
+            image_urls.append({
+                'url': url_for('static', filename=f'uploads/{file}'),
+                'description': metadata.get(file, '')
+            })
 
     return render_template('index.html', image_urls=image_urls)
 
@@ -91,6 +102,54 @@ def generate_test_script():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+def save_metadata(filename, description):
+    metadata_path = os.path.join(UPLOAD_FOLDER, 'metadata.json')
+    try:
+        with open(metadata_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except:
+        data = {}
+
+    data[filename] = description
+    with open(metadata_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def load_metadata():
+    metadata_path = os.path.join(UPLOAD_FOLDER, 'metadata.json')
+    try:
+        with open(metadata_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except:
+        return {}
+
+
+@app.route('/update-description', methods=['POST'])
+def update_description():
+    data = request.get_json()
+    filename = data.get('filename')
+    new_description = data.get('description')
+
+    if not filename:
+        return jsonify({'error': 'Thiếu filename'}), 400
+
+    metadata_path = os.path.join(UPLOAD_FOLDER, 'metadata.json')
+    try:
+        with open(metadata_path, 'r', encoding='utf-8') as f:
+            metadata = json.load(f)
+    except:
+        metadata = {}
+
+    if filename not in metadata:
+        return jsonify({'error': 'Ảnh không tồn tại trong metadata'}), 404
+
+    metadata[filename] = new_description
+    with open(metadata_path, 'w', encoding='utf-8') as f:
+        json.dump(metadata, f, ensure_ascii=False, indent=2)
+
+    return jsonify({'status': 'success'})
 
 
 @app.route('/back', methods=['GET'])
