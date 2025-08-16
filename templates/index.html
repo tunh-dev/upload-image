@@ -65,12 +65,6 @@
             cursor: pointer;
         }
 
-        .url-block {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
         .url-row {
             display: flex;
             gap: 8px;
@@ -157,6 +151,7 @@
             position: relative;
             background: white;
             cursor: pointer;
+            margin-left: 10px;
         }
 
         .checkbox:checked::after {
@@ -173,10 +168,20 @@
             vertical-align: middle;
         }
 
-        .desc-edit-input {
-            border-radius: 4px;
-            border: 1px solid #ccc;
+        .icon-btn {
+            width: 25px;
+            height: 25px;
+            padding: 0;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
         }
+
     </style>
 </head>
 <body>
@@ -200,56 +205,50 @@
     </div>
     <div class="grid" id="imageGrid">
         {% for img in image_urls %}
-            <label class="image-item" style="flex-direction: column; align-items: flex-start;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <img class="thumbnail" src="{{ img.url }}"
-                         onclick="showZoom('{{ img.url }}'); event.stopPropagation();">
-                    <div class="url-block" style="flex-grow: 1;">
-                        <div class="url-row" style="margin-bottom: 6px;">
-                            <input type="text" class="url-text" value="{{ request.url_root }}{{ img.url[1:] }}"
-                                   readonly>
-                            <button class="copy-btn" onclick="copyToClipboard(this); event.stopPropagation();">Copy
-                            </button>
-                            <button class="delete-btn" onclick="deleteImage('{{ img.url }}'); event.stopPropagation();">
-                                X
-                            </button>
-                        </div>
-
-                        <!-- Phần mô tả nằm dưới URL, cùng hàng -->
-                        <div class="url-row" style="align-items: center; gap: 8px;">
-                            <span class="desc-text" style="font-size: 14px; color: #333;">{{ img.description }}</span>
-                            <input type="text" class="desc-edit-input" value="{{ img.description }}"
-                                   style="display:none; flex: 1; padding: 4px;">
-                            <button class="copy-btn" onclick="toggleEdit(this)" title="Sửa mô tả">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="delete-btn" style="background: #10b981;"
-                                    onclick="saveDescription(this, '{{ img.url.split('/')[-1] }}')" title="Lưu mô tả">
-                                <i class="fa-solid fa-floppy-disk"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <input type="checkbox" class="checkbox" value="{{ request.url_root }}{{ img.url[1:] }}"
-                           onchange="this.closest('label').classList.toggle('selected', this.checked)">
+            <label class="image-item" style="justify-content: space-between;">
+                <!-- Ảnh -->
+                <div style="display: flex; align-items: center; cursor: pointer;"
+                     onclick="showZoom('{{ img.url }}'); event.stopPropagation();">
+                    <img class="thumbnail" src="{{ img.url }}" alt="Ảnh đã upload">
                 </div>
 
-                {#                <!-- Hiển thị mô tả -->#}
-                {#                <div style="margin-top: 8px; width: 100%;">#}
-                {#                    <span class="desc-text" style="font-size: 14px; color: #333;">{{ img.description }}</span>#}
-                {#                    <input type="text" class="desc-edit-input" value="{{ img.description }}"#}
-                {#                           style="display:none; width: 80%; padding: 4px; margin-top: 5px;">#}
-                {#                    <div style="margin-top: 4px;">#}
-                {#                        <button class="copy-btn" onclick="toggleEdit(this)" title="Sửa mô tả">#}
-                {#                            <i class="fa-solid fa-pen"></i>#}
-                {#                        </button>#}
-                {#                        <button class="delete-btn" style="background: #10b981;"#}
-                {#                                onclick="saveDescription(this, '{{ img.url.split('/')[-1] }}')" title="Lưu mô tả">#}
-                {#                            <i class="fa-solid fa-floppy-disk"></i>#}
-                {#                        </button>#}
-                {#                    </div>#}
-                {#                </div>#}
+                <!-- Khối chứa URL + mô tả + các nút -->
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Hàng URL -->
+                    <div class="url-row" style="display: flex; align-items: center; gap: 8px;">
+                        <input type="text" class="url-text" value="{{ request.url_root }}{{ img.url[1:] }}" readonly
+                               style="flex: 1;">
+                        <button class="icon-btn copy-btn" onclick="copyToClipboard(this); event.stopPropagation();"
+                                title="Copy">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                        <button class="icon-btn delete-btn"
+                                onclick="deleteImage('{{ img.url }}'); event.stopPropagation();"
+                                title="Xoá ảnh">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Hàng mô tả -->
+                    <!-- Hàng mô tả -->
+                    <div class="url-row" style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                        <input type="text" class="url-text" value="{{ img.description }}" readonly>
+                        <button class="icon-btn copy-btn" onclick="toggleEdit(this)" title="Sửa mô tả">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="icon-btn delete-btn" style="background: #10b981;"
+                                onclick="saveDescription(this, '{{ img.url.split('/')[-1] }}')" title="Lưu mô tả">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Checkbox cuối cùng, không đổi -->
+                <input type="checkbox" class="checkbox" value="{{ request.url_root }}{{ img.url[1:] }}"
+                       onchange="this.closest('label').classList.toggle('selected', this.checked)">
             </label>
+
 
         {% endfor %}
     </div>
@@ -276,7 +275,7 @@
         const reader = new FileReader();
         reader.onload = function (e) {
             const wrapper = document.createElement('div');
-            wrapper.style.display = 'inline-block';
+            wrapper.style.display = 'inline-grid';
             wrapper.style.margin = '5px';
             wrapper.style.textAlign = 'center';
 
@@ -293,7 +292,7 @@
             inputDesc.placeholder = 'Mô tả ảnh';
             inputDesc.className = 'image-desc-input';
             inputDesc.style.marginTop = '5px';
-            inputDesc.style.width = '100px';
+            inputDesc.style.width = '92px';
             wrapper.appendChild(inputDesc);
 
             previewContainer.appendChild(wrapper);
@@ -416,9 +415,7 @@
 
     function saveDescription(button, filename) {
         const label = button.closest('label');
-        const input = label.querySelector('.desc-edit-input');
-        const span = label.querySelector('.desc-text');
-
+        const input = label.querySelectorAll('.url-text')[1];  // lấy ô mô tả (ô thứ 2)
         const newDesc = input.value;
 
         fetch('/update-description', {
@@ -429,14 +426,35 @@
             body: JSON.stringify({filename, description: newDesc})
         }).then(res => res.json()).then(data => {
             if (data.status === 'success') {
-                span.innerText = newDesc;
-                input.style.display = 'none';
-                span.style.display = 'inline';
+                input.setAttribute('readonly', true);  // khóa lại sau khi lưu
             } else {
                 alert("Không thể lưu mô tả: " + data.error);
             }
         });
     }
+
+
+    function toggleEdit(button) {
+        const label = button.closest('label');
+        const inputs = label.querySelectorAll('.url-text');
+        const input = inputs[1];  // ô mô tả
+
+        input.removeAttribute('readonly');
+        input.focus();
+
+        // Đánh dấu đang sửa
+        input.classList.add('editing');
+    }
+
+    document.addEventListener('click', function (event) {
+        const editingInput = document.querySelector('.url-text.editing');
+        if (editingInput && !editingInput.contains(event.target)) {
+            if (!editingInput.parentElement.contains(event.target)) {
+                editingInput.setAttribute('readonly', true);
+                editingInput.classList.remove('editing');
+            }
+        }
+    });
 
 </script>
 </body>
