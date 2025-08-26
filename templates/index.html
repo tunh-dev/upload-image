@@ -31,7 +31,7 @@
             cursor: pointer;
         }
 
-        #generate-btn {
+        .generate-btn {
             padding: 10px 16px;
             font-size: 16px;
             background: #10b981;
@@ -201,7 +201,8 @@
 {% if image_urls %}
     <h3>Danh sách ảnh đã lưu:</h3>
     <div class="top-bar">
-        <button id="generate-btn" onclick="generateTestScenario()">Generate TestScenario</button>
+        <button id="generate-btn" class="generate-btn" onclick="generateTestScenario()">Generate TestScenario</button>
+        <a href="/view-dataset" class="generate-btn">View Dataset</a>
     </div>
     <div class="grid" id="imageGrid">
         {% for img in image_urls %}
@@ -383,7 +384,7 @@
         const checked = document.querySelectorAll('.checkbox:checked');
         const urls = Array.from(checked).map(cb => cb.value);
         if (urls.length === 0) {
-            alert("Bạn cần chọn ít nhất một ảnh.");
+            alert("Cần chọn ít nhất một ảnh.");
             return;
         }
         document.getElementById('scenario-urls').value = JSON.stringify(urls);

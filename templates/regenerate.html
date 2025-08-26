@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Regenerate Dataset</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px auto;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .arrow-btn {
+            font-size: 24px;
+            padding: 6px 12px;
+            cursor: pointer;
+            border: none;
+            background: #3b82f6;
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            height: 40px;
+        }
+
+        .preview-img {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+
+        .primary-btn {
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .nav-button {
+            background: #eee;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #000;
+        }
+    </style>
+</head>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" style="
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+">
+    <div style="
+        border: 6px solid #ccc;
+        border-top: 6px solid #6366f1;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 0.8s linear infinite;
+    "></div>
+</div>
+
+<style>
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+
+<body>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <a href="/view-dataset" class="nav-button">View Dataset</a>
+    <a href="/" class="nav-button">Home</a>
+</div>
+
+
+<h2>Regenerate Dataset</h2>
+
+<!-- Ảnh -->
+<div>
+    {% for url in urls %}
+        <img src="{{ url }}" class="preview-img">
+    {% endfor %}
+</div>
+
+<!-- Feature Desc -->
+<div class="textarea-container">
+    <label style="font-weight: bold;">Feature Description</label>
+    <textarea id="featureDesc">{{ feature_desc }}</textarea>
+</div>
+
+<!-- Generated Script -->
+<div class="textarea-container">
+    <label style="font-weight: bold;">Test Script</label>
+    <textarea id="testScript">{{ generated_test_script }}</textarea>
+</div>
+
+<!-- Ground Truth -->
+<div class="textarea-container">
+    <label style="font-weight: bold;">Ground-Truth Script</label>
+    <textarea id="groundTruthScript">{{ ground_truth_script }}</textarea>
+</div>
+
+<!-- Update button -->
+<div style="text-align: center;">
+    <button class="primary-btn" onclick="generateScript()">Generate</button>
+    <button class="primary-btn" onclick="updateDataset()">Update Dataset</button>
+</div>
+
+<script>
+
+    function generateScript() {
+    const featureDesc = document.getElementById('featureDesc').value.trim();
+    const images = Array.from(document.querySelectorAll('.preview-img')).map(img => img.src);
+    const resultArea = document.getElementById('testScript');
+
+    if (!featureDesc) {
+        alert("Fill Feature Description trước khi generate.");
+        return;
+    }
+
+    // Hiện loading
+    document.getElementById('loadingOverlay').style.display = 'flex';
+
+    fetch("/generate-test-script", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            images: images,
+            action: featureDesc
+        })
+    })
+    .then(res => res.text())
+    .then(data => {
+        resultArea.value = data;
+        document.getElementById('loadingOverlay').style.display = 'none';
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Lỗi khi gọi API Generate.");
+        document.getElementById('loadingOverlay').style.display = 'none';
+    });
+}
+
+
+    function updateDataset() {
+        const featureDesc = document.getElementById('featureDesc').value.trim();
+        const generatedScript = document.getElementById('testScript').value.trim();
+        const groundTruth = document.getElementById('groundTruthScript').value.trim();
+        const images = Array.from(document.querySelectorAll('.preview-img')).map(img => img.src);
+
+        fetch("/update-dataset-item/{{ dataset_index }}", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                images: images,
+                feature_desc: featureDesc,
+                generated_test_script: generatedScript,
+                ground_truth_script: groundTruth
+            })
+        }).then(res => res.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    window.location.href = "/view-dataset";
+                }
+            });
+    }
+</script>
+</body>
+</html>
