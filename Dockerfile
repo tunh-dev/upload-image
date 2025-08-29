@@ -23,7 +23,7 @@ COPY . /app/
 RUN mkdir -p /app/static/uploads
 
 # Expose port
-EXPOSE 5000
+EXPOSE 5001
 
 # Start the app with Python (Flask built-in server)
 CMD ["python", "main.py"]

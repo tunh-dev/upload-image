@@ -93,7 +93,7 @@ def generate_test_script():
 
     try:
         res = requests.post(
-            "http://14.225.36.82:5000/get-test-scenario",
+            "http://localhost:5000/get-test-scenario",
             json={
                 "images": data.get("images", []),
                 "action": data.get("action", "")
@@ -159,7 +159,7 @@ def update_description():
 
 
 @app.route("/save-metadata", methods=["POST"])
-def save_metadata():
+def save_metadata_api():
     data = request.get_json()
 
     image_filenames = [url.split("/")[-1] for url in data["images"]]
@@ -470,4 +470,4 @@ def export_excel():
     return send_file(out_path, as_attachment=True, download_name=out_name)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)
