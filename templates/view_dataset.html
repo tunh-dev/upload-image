@@ -65,6 +65,37 @@
             font-weight: bold;
             color: #000;
         }
+
+        .zoom-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .zoom-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+            box-shadow: 0 0 20px #fff;
+        }
+
+        .zoom-close {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10000;
+        }
     </style>
 </head>
 <body>
@@ -74,10 +105,10 @@
 </div>
 
 <div style="text-align:right; margin-bottom: 12px;">
-  <a href="/export-excel" class="save-btn" style="
+    <a href="/export-excel" class="save-btn" style="
       background:#6366f1; color:#fff; padding:8px 14px; border-radius:6px; text-decoration:none;">
-      Xuất Excel
-  </a>
+        Xuất Excel
+    </a>
 </div>
 
 <h2>View Dataset</h2>
@@ -117,7 +148,7 @@
                 <td>
                     <div style="display: flex; flex-wrap: wrap; gap: 6px; max-width: 240px;">
                         ${item.images.map(img => `
-                            <img src="/static/uploads/${img}"
+                            <img src="/static/uploads/${img}" onclick="showZoom(this.src)"
                                  style="width:70px; height:70px; object-fit:cover; border:1px solid #ccc; border-radius:4px;" />
                         `).join("")}
                     </div>
@@ -161,7 +192,24 @@
         });
     }
 
+    function showZoom(src) {
+        document.getElementById('zoomImage').src = src;
+        document.getElementById('zoomOverlay').style.display = 'flex';
+    }
+
+    function hideZoom() {
+        document.getElementById('zoomOverlay').style.display = 'none';
+        document.getElementById('zoomImage').src = '';
+    }
+
     loadDataset();
 </script>
+
+<!-- ZOOM OVERLAY -->
+<div id="zoomOverlay" class="zoom-overlay" onclick="hideZoom()">
+    <span class="zoom-close" onclick="hideZoom()">×</span>
+    <img id="zoomImage" src="">
+</div>
+
 </body>
 </html>

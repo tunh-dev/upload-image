@@ -3,6 +3,8 @@ import os
 from datetime import datetime
 import json
 import requests
+import re
+
 from flask import send_file
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
@@ -62,13 +64,26 @@ def index():
                 })
 
     # Load ảnh đã lưu
-    for file in sorted(os.listdir(UPLOAD_FOLDER), reverse=True):
-        if file.lower().endswith(('png', 'jpg', 'jpeg', 'gif', 'bmp')):
-            metadata = load_metadata()
-            image_urls.append({
-                'url': url_for('static', filename=f'uploads/{file}'),
-                'description': metadata.get(file, '')
-            })
+    def extract_datetime_from_filename(filename):
+        try:
+            name = filename.rsplit('.', 1)[0]  # Bỏ phần .png, .jpg,...
+            date_part, ms_part = name.split('_')
+            dt = datetime.strptime(date_part, "%d%m%Y")
+            return dt.timestamp() * 1000 + int(ms_part)
+        except Exception:
+            return 0  # nếu lỗi định dạng thì cho xuống cuối
+
+    files = [f for f in os.listdir(UPLOAD_FOLDER)
+             if f.lower().endswith(('png', 'jpg', 'jpeg', 'gif', 'bmp'))]
+
+    files.sort(key=extract_datetime_from_filename, reverse=True)
+
+    metadata = load_metadata()
+    for file in files:
+        image_urls.append({
+            'url': url_for('static', filename=f'uploads/{file}'),
+            'description': metadata.get(file, '')
+        })
 
     return render_template('index.html', image_urls=image_urls)
 
@@ -93,7 +108,8 @@ def generate_test_script():
 
     try:
         res = requests.post(
-            "http://host.docker.internal:5000/get-test-scenario",
+            "http://localhost:5000/get-test-scenario",
+            # "http://host.docker.internal:5000/get-test-scenario",
             json={
                 "images": data.get("images", []),
                 "action": data.get("action", "")
