@@ -108,8 +108,8 @@ def generate_test_script():
 
     try:
         res = requests.post(
-            "http://localhost:5000/get-test-scenario",
-            # "http://host.docker.internal:5000/get-test-scenario",
+            # "http://localhost:5000/get-test-scenario",
+            "http://host.docker.internal:5000/get-test-scenario",
             json={
                 "images": data.get("images", []),
                 "action": data.get("action", "")
