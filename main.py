@@ -1,16 +1,15 @@
-from flask import Flask, render_template, request, url_for, jsonify, redirect
-import os
-from datetime import datetime
 import json
-import requests
-import re
+import os
+from copy import copy
+from datetime import datetime
 
+import requests
+from flask import Flask, render_template, request, url_for, jsonify, redirect
 from flask import send_file
 from openpyxl import load_workbook
+from openpyxl.drawing.image import Image as XLImage
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
-from openpyxl.drawing.image import Image as XLImage
-from copy import copy
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
