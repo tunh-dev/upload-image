@@ -244,6 +244,10 @@
     const rightBtn = document.getElementById('rightBtn');
     let currentIndex = 0;
 
+    // Lưu thứ tự chọn theo URL
+    let selectionSeq = 0;
+    const selectionOrder = new Map(); // url -> thứ tự click (1,2,3,...)
+
     function renderPreviews() {
         previewContainer.innerHTML = '';
         const visible = allUrls.slice(currentIndex, currentIndex + 5);
@@ -251,7 +255,27 @@
             const img = document.createElement('img');
             img.src = url;
             img.className = 'preview-img';
-            img.onclick = () => showZoom(url);
+            img.onclick = () => {
+                // Toggle chọn
+                const isSelected = img.classList.toggle('selected');
+                if (isSelected) {
+                    if (!selectionOrder.has(url)) {
+                        selectionSeq += 1;
+                        selectionOrder.set(url, selectionSeq);
+                    }
+                    img.dataset.clickOrder = selectionOrder.get(url);
+                } else {
+                    selectionOrder.delete(url);
+                    delete img.dataset.clickOrder;
+                }
+                // vẫn cho zoom nếu muốn
+                showZoom(url);
+            };
+            // Khi re-render, nếu url đã được chọn thì gắn lại trạng thái + order
+            if (selectionOrder.has(url)) {
+                img.classList.add('selected');
+                img.dataset.clickOrder = selectionOrder.get(url);
+            }
             previewContainer.appendChild(img);
         });
 
@@ -302,9 +326,21 @@
         textarea.style.height = textarea.scrollHeight + "px";
     }
 
+    function getImagesForRequest() {
+        // Nếu đã chọn ít nhất 1 ảnh → gửi theo thứ tự click
+        if (selectionOrder.size > 0) {
+            return Array.from(selectionOrder.entries())
+                .sort((a, b) => a[1] - b[1]) // sort theo số thứ tự
+                .map(([url]) => url);
+        }
+        // Chưa chọn ảnh nào → fallback: gửi 5 ảnh đang hiển thị
+        return allUrls.slice(currentIndex, currentIndex + 5);
+    }
+
+
     function callGenerateAPI() {
         const featureDesc = document.getElementById('featureDesc').value.trim();
-        const visibleImages = Array.from(document.querySelectorAll('.preview-img')).map(img => img.src);
+        const visibleImages = getImagesForRequest();
         const resultArea = document.getElementById('testScript');
 
         if (!featureDesc) {
@@ -340,7 +376,7 @@
         const featureDesc = document.getElementById('featureDesc').value.trim();
         const generatedScript = document.getElementById('testScript').value.trim();
         const groundTruthScript = document.getElementById('groundTruthScript').value.trim();
-        const visibleImages = Array.from(document.querySelectorAll('.preview-img')).map(img => img.src);
+        const visibleImages = getImagesForRequest();
 
         if (!featureDesc || !groundTruthScript) {
             alert("Fill Feature Description, Ground-Truth Script trước khi lưu.");
@@ -371,6 +407,15 @@
             });
     }
 
+    // Đóng zoom khi bấm ESC
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+            const overlay = document.getElementById('zoomOverlay');
+            if (overlay && overlay.style.display !== 'none') {
+                hideZoom(); // đã có sẵn ở file này
+            }
+        }
+    });
 
     renderPreviews();
 </script>

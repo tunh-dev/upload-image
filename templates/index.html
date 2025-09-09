@@ -382,7 +382,11 @@
 
     function generateTestScenario() {
         const checked = document.querySelectorAll('.checkbox:checked');
-        const urls = Array.from(checked).map(cb => cb.value);
+        // Sắp xếp theo thứ tự click đã lưu trong data-click-order
+        const urls = Array.from(checked)
+            .sort((a, b) => (parseInt(a.dataset.clickOrder || '0', 10) - parseInt(b.dataset.clickOrder || '0', 10)))
+            .map(cb => cb.value);
+
         if (urls.length === 0) {
             alert("Cần chọn ít nhất một ảnh.");
             return;
@@ -457,6 +461,35 @@
         }
     });
 
+
+    // Ghi lại thứ tự click cho checkbox
+    let clickSeq = 0;
+
+    document.getElementById('imageGrid')?.addEventListener('change', function (e) {
+        const cb = e.target.closest('.checkbox');
+        if (!cb) return;
+
+        if (cb.checked) {
+            // mỗi lần tick sẽ tăng thứ tự
+            clickSeq += 1;
+            cb.dataset.clickOrder = clickSeq;   // lưu order
+            cb.closest('label')?.classList.add('selected');
+        } else {
+            // bỏ chọn thì xóa order
+            delete cb.dataset.clickOrder;
+            cb.closest('label')?.classList.remove('selected');
+        }
+    });
+
+    // Đóng zoom khi bấm ESC
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+            const overlay = document.getElementById('zoomOverlay');
+            if (overlay && overlay.style.display !== 'none') {
+                hideZoom(); // đã có sẵn ở file này
+            }
+        }
+    });
 </script>
 </body>
 </html>

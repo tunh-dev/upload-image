@@ -269,6 +269,7 @@ def delete_dataset():
 
     return jsonify({"status": "ok"})
 
+
 @app.route("/regenerate/<int:index>")
 def regenerate(index):
     metadata_path = "static/uploads/metadata_submission.json"
@@ -484,6 +485,7 @@ def export_excel():
     out_path = os.path.join(os.path.dirname(__file__), out_name)
     wb.save(out_path)
     return send_file(out_path, as_attachment=True, download_name=out_name)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
